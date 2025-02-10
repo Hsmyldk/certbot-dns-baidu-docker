@@ -27,7 +27,7 @@ ENV CONF_PATH="/var/lib/letsencrypt/credentials.ini"
 ENV DOMAINS=""
 ENV PROPAGATION_SECONDS=120
 ENV EMAIL=""
-ENV CRON_SCHEDULE="0 0 0 * *"
+ENV CRON_SCHEDULE="0 0 * * *"
 
 # 设置续期证书定时任务
 RUN echo "$CRON_SCHEDULE certbot renew -a dns-baidu --dns-baidu-credentials $CONF_PATH --dns-baidu-propagation-seconds 120 --email $EMAIL" >> /var/lib/letsencrypt/renwe.log
