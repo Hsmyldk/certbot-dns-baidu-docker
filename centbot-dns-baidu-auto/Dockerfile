@@ -15,24 +15,22 @@ RUN pip install --upgrade pip
 COPY certbot_dns_baidu-0.2.0-py2.py3-none-any.whl /var/lib/letsencrypt/certbot_dns_baidu-0.2.0-py2.py3-none-any.whl
 RUN pip install /var/lib/letsencrypt/certbot_dns_baidu-0.2.0-py2.py3-none-any.whl
 
-# 复制启动sh
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # 复制申请证书sh
 COPY certonly.sh /usr/local/bin/certonly.sh
 RUN chmod +x /usr/local/bin/certonly.sh
 
+# 复制续期证书sh
+COPY renew.sh /usr/local/bin/renew.sh
+RUN chmod +x /usr/local/bin/renew.sh
+
+# 复制cron执行sh
+COPY cron.sh /etc/periodic/daily/cron.sh
+RUN chmod +x /etc/periodic/daily/cron.sh
+
 ENV CONF_PATH="/var/lib/letsencrypt/credentials.ini"
-ENV DOMAINS=""
 ENV PROPAGATION_SECONDS=120
 ENV EMAIL=""
-ENV CRON_SCHEDULE="0 0 * * *"
-
-# 设置续期证书定时任务
-RUN echo "$CRON_SCHEDULE certbot renew -a dns-baidu --dns-baidu-credentials $CONF_PATH --dns-baidu-propagation-seconds 120 --email $EMAIL" >> /var/lib/letsencrypt/renwe.log
-# RUN echo "$CRON_SCHEDULE certbot renew --dry-run -a dns-baidu --dns-baidu-credentials $CONF_PATH --dns-baidu-propagation-seconds 120 --email $EMAIL" >> /var/lib/letsencrypt/renwe.log
 
 WORKDIR /usr/local/bin/
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["crond","-f","-l","2"]
